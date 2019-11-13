@@ -9,6 +9,8 @@ import sys
 from datetime import datetime
 startTime = datetime.now()
 
+
+loc=""
 for stuff in sys.argv:
 	if "master.py" in stuff:
 		loc = stuff.split("master.py")[0]

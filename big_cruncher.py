@@ -66,7 +66,7 @@ TYPE = sys.argv[-7]
 ext = sys.argv[-6]
 FILE = sys.argv[-5]
 freq = int(sys.argv[-4])
-score = int(sys.argv[-3])
+SCORE = int(sys.argv[-3])
 length = int(sys.argv[-2])
 IDENTIFIANTS =  sys.argv[-1]
 
@@ -176,13 +176,13 @@ for sp in species:
 							else:
 								dico[sp][st1][st2][id1] = {}
 							s1,s2 = float(size[sp][id1]),float(size[sp][id2])
-							if s1/s2 >= south and s1/s2 <=north:
+							if s1/s2 >= south and s1/s2 <=north and float(a[2]) >= SCORE:
 								dico[sp][st1][st2][id1][id2] = float(a[2])
 						else:
 							"Usearch issue: File BBH/" + st1 + "-" + st2," did not finish running"
 					f.close()
 					if nb == 0:
-						"Usearch issue: File BBH/" + st1 + "-" + st2," is empty. You should remove empty genome or relaunch Usearch"
+						"Usearch issue: File BBH/" + st1 + "-" + st2," is empty. You should remove empty genomes or relaunch the analysis"
 
 size={}
 

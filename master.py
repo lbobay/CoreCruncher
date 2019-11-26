@@ -1,6 +1,6 @@
 
 
-print("USAGE: python master.py  -in input_folder   -out  output_folder   OPTIONAL: -freq  frequency_across_genomes  -ref ref_genome  -id unique/combined   -ext .fa/.fasta/.prot/.faa   -list path_to_genome_list   -score identify_score   -length sequence_length_conservation  -restart yes/no") 
+print("USAGE: python master.py  -in input_folder   -out  output_folder   OPTIONAL: -freq  frequency_across_genomes  -ref ref_genome -prog usearch/blast -id unique/combined   -ext .fa/.fasta/.prot/.faa   -list path_to_genome_list   -score identify_score   -length sequence_length_conservation  -restart yes/no    -align muscle/mafft") 
 print("Use -h to see the different options\n")
 
 import os
@@ -24,19 +24,23 @@ REF = "NA"
 
 arguments =   sys.argv
 
+
 if "-h" in arguments:
 	print("\nUSAGE:")
 	print("-in      input folder")
 	print("-out     output folder")
 	print("\nOPTIONS: ")
 	print("-freq     Minimum frequency of the gene across genomes to be considered core (default= 90%, an ortholog is considered a core gene even if it is missing in 10% of the set of genomes)")
-	print("-score    Identity score used by usearch to define orthologs in % (Default= 70)")
+	print("-score    Identity score used by usearch or blast to define orthologs in % (Default= 70)")
 	print("-length   Minimum sequence length conservation used by to define orthologs (default= 80%)")
+	print("-prog     Program to use to compare sequences: usearch or blast (default= usearch)")
 	print("-ref      Reference genome (default: first genome in folder will be used as reference). If you want to specify the reference genome to use, speficy the name of the file in the folder (e.g. -ref genome1.prot)")
 	print("-id       Type of gene IDs in output files. Choose 'unique' if the same gene IDs are not found in different genomes or 'combined' to combine genome ID & gene ID (default= 'combined').  ")
-	print("-ext	     File extensions .fa/.fasta/.prot/.faa (default: .fa )")
+	print("-ext	     File extensions .fa/.fasta/.prot/.faa (default: will try to find it automatically)")
 	print("-list     Path to a file containing the list of genomes to analyze (default: none, all the genomes in the folder will be analyzed by default)")
-	print("-restart  Restart analysis from scratch yes or no (default= no). If yes is chosen, the program will erase the usearch output files and relaunch usearch")
+	print("-restart  Restart analysis from scratch: yes or no (default= no). If yes is chosen, the program will erase the usearch output files and relaunch usearch or blast")
+	print("-align    Align core gene sequences with specified program (muscle or mafft) and merge all the core genes into a single concatenate. Example=  -align musclev0.0.0 or -align mafft)")
+
 	exit()
 
 if "-in" in arguments:
@@ -77,6 +81,16 @@ if "-list" in arguments:
 else:
 	FILE = "none"
 
+PROG = "usearch"
+if "-prog" in arguments:
+	i = arguments.index("-prog")
+	PROG = arguments[i+1].lower()
+
+if "usearch" in PROG:
+	PROG="usearch"
+elif "blast" in PROG:
+	PROG="blast"
+
 if "-score" in arguments:
 	i = arguments.index("-score")
 	score= arguments[i+1]
@@ -100,6 +114,12 @@ if "-restart" in arguments:
 	restart = arguments[i+1]
 else:
 	restart= "no"
+
+ALIGN="muscle"
+if "-align" in arguments:
+	i = arguments.index("-align")
+	ALIGN = arguments[i+1]
+
 
 print("input = ", path)
 print("output = ", path)
@@ -129,7 +149,7 @@ except OSError:
 tmp = os.listdir(path)
 
 
-extensions=[".fa",".fasta",".prot",".faa",".fna",""]
+extensions=[".fa",".fasta",".prot",".faa",".fna",".fnn",""]
 if ext in extensions:
 	extensions.remove(ext)
 
@@ -144,8 +164,18 @@ for stuff in tmp:
 if ext == "NA":
 	if len(ext_found)==1:
 		ext = ext_found[0]
+		print("Files with extension",ext, "have been found. These files will be used for analysis. You can specify a different extension with -ext")
 	else:
-		print("Please specify the extension of the files that you want to analyze, the following have been found:",ext_found)
+		tmp=[]
+		for stuff in ext_found:
+			if stuff in extensions:
+				if stuff not in tmp:
+					tmp.append(stuff)
+		if len(tmp)==1:
+			ext = tmp[0]
+			print("Files with extension",ext, "have been found. These files will be used for analysis. You can specify a different extension with -ext")
+		else:
+			print("Please specify the extension of the files that you want to analyze, the following have been found:",ext_found)
 
 memo=[]
 tag=0
@@ -227,14 +257,26 @@ print("Reference genome= ", REF)
 print(datetime.now() - startTime)
 
 print("TAG")
-os.system("python " + loc + "usearch_core.py  " + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
-
+if PROG=="usearch":
+	os.system("python " + loc + "usearch_core.py  " + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
+elif PROG=="blast":
+	os.system("python " + loc + "blast_core.py  " + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
+else:
+	print("UNKNOWN PROGRAM",PROG)
 
 print("TAG2")
-print("Usearch complete")
+print("Sequence search complete")
 print(datetime.now() - startTime)
 
 os.system("python " + loc + "big_cruncher.py  " + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
+
+
+if "-align" in arguments:
+	print("Launch alignments with ",ALIGN)
+	os.system("python " + loc + "align.py " + ALIGN + " " + out_path + " " + ext)
+	os.system("python " + loc + "concat.py " + out_path + " " + ext )
+
+
 
 
 print(datetime.now() - startTime)

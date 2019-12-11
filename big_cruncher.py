@@ -96,6 +96,7 @@ else:
 			sub.append(file)
 
 
+
 print("load sequences")
 check=[]
 genomes={}
@@ -117,7 +118,7 @@ for sp in species:
 				f=open(path + file ,"r")
 				for l in f:
 					if l[0]==">":
-						id = l.strip(">").strip("\n").split(" ")[0]
+						id = l.strip(">").strip("\n").split(" ")[0].split("\t")[0]
 						if IDENTIFIANTS == "unique":
 							id=id
 						else:
@@ -138,6 +139,12 @@ test={}
 toto={}
 parent={}
 
+
+tmp = list(size[sp].keys())
+
+#for stuff in tmp:
+#	if stuff.startswith("contig"):
+#		print("KEY",stuff,size[sp][stuff])
 
 print("IDENTIFIANTS= ",IDENTIFIANTS)
 if IDENTIFIANTS == 	"Redundant":
@@ -162,11 +169,11 @@ for sp in species:
 					f=open(out_path +  "BBH/" + st1 + "-" + st2 ,"r")
 					for l in f:
 						a=l.strip("\n").split("\t")
-						if len(a) > 3:
+						if len(a) == 10:
 							nb+=1
 							if IDENTIFIANTS == "unique":
 								id1 =  a[0].split(" ")[0]
-								id2 =  a[1].split(" ")[0]				
+								id2 =  a[1].split(" ")[0]			
 							else:
 								id1 = st1 + "&" + a[0].split(" ")[0]
 								id2 = st2 + "&" + a[1].split(" ")[0]
@@ -176,8 +183,40 @@ for sp in species:
 							else:
 								dico[sp][st1][st2][id1] = {}
 							s1,s2 = float(size[sp][id1]),float(size[sp][id2])
-							if s1/s2 >= south and s1/s2 <=north and float(a[2]) >= SCORE:
-								dico[sp][st1][st2][id1][id2] = float(a[2])
+							i = len(a[2])
+							if s1/s2 >= south and s1/s2 <=north and float(a[i]) >= SCORE:
+								dico[sp][st1][st2][id1][id2] = float(a[i])
+						if len(a) > 10:
+							nb+=1
+							extras = len(a) - 10
+							if IDENTIFIANTS == "unique":
+								id1 =  a[0].split(" ")[0]
+								id2="none"
+								i=0
+								while i <= extras:
+									truc2 = a[i].split(" ")[0]
+									if truc2 in size[sp]:
+										id2=str(truc2)
+									i+=1
+							else:
+								id1 = st1 + "&" + a[0].split(" ")[0]
+								id2="none"
+								i=0
+								while i <= extras:
+									truc2 = a[i].split(" ")[0]
+									if st2 + "&" + truc2 in size[sp]:
+										id2 = st2 + "&" + str(truc2)
+									i+=1
+							#print(id1," ",id2," ",a[2:]
+							if id1 in dico[sp][st1][st2]:
+								pass
+							else:
+								dico[sp][st1][st2][id1] = {}
+							#print(id1,id2)
+							s1,s2 = float(size[sp][id1]),float(size[sp][id2])
+							i = len(a) - 10
+							if s1/s2 >= south and s1/s2 <=north and float(a[i]) >= SCORE:
+								dico[sp][st1][st2][id1][id2] = float(a[i])
 						else:
 							"Usearch issue: File BBH/" + st1 + "-" + st2," did not finish running"
 					f.close()
@@ -273,6 +312,8 @@ for sp in species:
 				resu = l.strip("\n").strip(">").split(" ")[0]
 			else:
 				resu =   REF + "&" + l.strip("\n").strip(">").split(" ")[0]
+			if "\t" in resu:
+				resu = resu.split("\t")[0]
 			fam = "fam" + str(nb)
 			link[sp][resu] = fam
 			families[sp][fam] = [resu]
@@ -356,7 +397,6 @@ for sp in species:
 	for fam in families[sp]:
 		total+=1
 		if fam not in problematic:
-			#print(fam," ",families[sp][fam]
 			if len(families[sp][fam]) >= cutoff:
 				core[sp].append(fam)
 				for resu in families[sp][fam]:
@@ -448,7 +488,7 @@ for sp in species:
 							orthologs.append(dico[sp][ref][st][ref_id][para])
 			#print(ref_id," ",tmp
 		if len(paralogs) == 0:
-			print(fam," no paralogs")
+			#print(fam," no paralogs")
 			tag=1
 			#h.write(">" + fam + "&" + ref_id + "\n" + seq[sp][ref_id] + "\n")
 			if ref_id in selected:
@@ -461,7 +501,7 @@ for sp in species:
 		elif len(paralogs) > 0:
 			#print(fam," ",max(paralogs)," ",min(orthologs)
 			if max(paralogs)<=min(orthologs):
-				print(fam," max(paralogs)<=min(orthologs)")
+				#print(fam," max(paralogs)<=min(orthologs)")
 				tag=1
 				#h.write(">" + fam + "&" + ref_id + "\n" + seq[sp][ref_id] + "\n")
 				#g.write(">" + fam + "&" + ref_id + "\n" + seq[sp][ref_id] + "\n")
@@ -505,7 +545,7 @@ for sp in species:
 							else:
 								memo.append([score,down,up])
 								outlier ="y"
-								print(fam," double outlier ",score," ",down,"-",up,"    and   ",down_vert," ",up_vert," SD= ",vert_sd)
+								#print(fam," double outlier ",score," ",down,"-",up,"    and   ",down_vert," ",up_vert," SD= ",vert_sd)
 					except KeyError:
 						pass
 			if outlier=="y":
@@ -544,7 +584,7 @@ for sp in species:
 				for l in f:
 					if l[0]==">":
 						tag=0
-						id = l.strip(">").strip("\n").split(" ")[0]
+						id = l.strip(">").strip("\n").split(" ")[0].split("\t")[0]
 						if IDENTIFIANTS == "unique":
 							id=id
 						else:

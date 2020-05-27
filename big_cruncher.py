@@ -59,6 +59,7 @@ SP="test"
 import sys
 import numpy
 
+stringent = sys.argv[-11]
 path = sys.argv[-10]
 out_path = sys.argv[-9]
 REF  = sys.argv[-8]
@@ -70,6 +71,9 @@ SCORE = int(sys.argv[-3])
 length = int(sys.argv[-2])
 IDENTIFIANTS =  sys.argv[-1]
 
+SAVE="yes"
+if stringent=="yes":
+	SAVE="no"
 
 species=[SP]
 
@@ -350,15 +354,11 @@ for sp in species:
 									problematic.append(fam2)
 						else:
 							link[sp][resu2] = fam1
-							if 1==1:
-								nb+=1
-								#print("second round ",id2," ",nb
+							nb+=1
 							if resu2 not in families[sp][fam1]:
 								families[sp][fam1].append(resu2)
 								
-				if 1==1:
-					#print(nb," pairs"
-					pass
+
 
 
 link={}
@@ -440,10 +440,11 @@ for sp in species:
 
 
 horizontal={}
-
 # Two steps:
 # Step 1 identify families with potential paralogs
 # Step 2 check if score is in the range of orthologs (in case of divergent genome)
+save=[]
+excommunicated={}
 filtered_core={}
 check=[]
 for sp in species:
@@ -499,14 +500,15 @@ for sp in species:
 				else:
 					print(fam," already there")
 		elif len(paralogs) > 0:
-			#print(fam," ",max(paralogs)," ",min(orthologs)
+			#print(fam," ",max(paralogs)," ",min(orthologs))
 			if max(paralogs)<=min(orthologs):
 				#print(fam," max(paralogs)<=min(orthologs)")
 				tag=1
 				#h.write(">" + fam + "&" + ref_id + "\n" + seq[sp][ref_id] + "\n")
 				#g.write(">" + fam + "&" + ref_id + "\n" + seq[sp][ref_id] + "\n")
 			else:
-				#print("\n Case: ", fam," ",paralogs," ",orthologs)
+				#print("   Case: ", fam," ",paralogs," ",orthologs)
+				save.append(fam)
 				nb+=1
 		if tag==1:
 			#print("Check ",fam," ",len(families[sp][fam])," ",families[sp][fam]
@@ -545,11 +547,16 @@ for sp in species:
 							else:
 								memo.append([score,down,up])
 								outlier ="y"
+								if fam in excommunicated:
+									excommunicated[fam].append(st)
+								else:
+									excommunicated[fam] = [st]
 								#print(fam," double outlier ",score," ",down,"-",up,"    and   ",down_vert," ",up_vert," SD= ",vert_sd)
 					except KeyError:
 						pass
 			if outlier=="y":
 				compteur+=1
+				save.append(fam)
 			else:
 				filtered_core[sp].append(fam)
 			
@@ -558,19 +565,91 @@ for sp in species:
 	#g.close()
 
 vertical={}
-dico={}
 core={}
 bbh={}
 
 print("Excluded: ", nb," genes")
-			
 print("There are ",compteur," families with double outliers\n")
+
+print("There are ",len(save)," genes that may be saved")
+
+
+
+reintroduced={}
+if SAVE=="yes":
+	case1,case2=0,0
+	print("exluding paralogs from orthologs")
+	for fam in save:
+		if fam in excommunicated:
+			tmp=[]
+			for id in families[sp][fam]:
+				st = id.split("&")[0]
+				if st not in excommunicated[fam]:
+					tmp.append(id)
+			#print(fam,len(tmp),cutoff)
+			if len(tmp) >= cutoff:
+				reintroduced[fam] = list(tmp)
+				case1+=1
+		else:
+			for resu in families[sp][fam]:
+				if IDENTIFIANTS == "unique":
+					id = resu
+					st=parent[id]
+				else:
+					a= resu.split("&")
+					st,id= a[0],resu
+				if st == ref:
+					ref_id = id
+			paralogs,orthologs=[],[]
+			for resu in families[sp][fam]:
+				if IDENTIFIANTS == "unique":
+					st,id= parent[resu],resu
+				else:
+					a= resu.split("&")
+					st,id= a[0],resu
+				if st != ref:
+					if ref_id in dico[sp][ref][st]:
+						for para in dico[sp][ref][st][ref_id]:
+							#print(fam,para,id)
+							if para != id:
+								paralogs.append(dico[sp][ref][st][ref_id][para])
+							else:
+								orthologs.append(id)
+			tmp=[]
+			for resu in families[sp][fam]:
+				if IDENTIFIANTS == "unique":
+					st,id= parent[resu],resu
+				else:
+					a= resu.split("&")
+					st,id= a[0],resu
+				if st != ref:
+					if ref_id in dico[sp][ref][st]:
+						for ortho in dico[sp][ref][st][ref_id]:
+							#print(fam,para,id)
+							if ortho == id:
+								if dico[sp][ref][st][ref_id][ortho] >= max(paralogs):
+									tmp.append(ortho)
+			#print("Other rescue",fam,len(paralogs),len(orthologs),len(tmp))
+			if len(tmp)>= cutoff:
+				reintroduced[fam] = list(tmp)
+				case2+=1
+	print(len(reintroduced.keys())," genes have been trimmed from paralogs and included in the core")
+	print("Reintroduced genes: ",reintroduced.keys())
+	print("Case1:",case1)
+	print("Case2:",case2)
+
+
+dico={}
+
 
 seq={}
 for sp in species:
 	seq[sp]={}
 	for fam in filtered_core[sp]:
 		for id in families[sp][fam]:
+			seq[sp][id]=""
+	for fam in reintroduced:
+		for id in reintroduced[fam]:
 			seq[sp][id]=""
 
 
@@ -616,9 +695,18 @@ for sp in species:
 			resu += "\t" + id
 		h.close()
 		g.write(resu + "\n")
+	for fam in reintroduced:
+		resu = fam
+		h=open(out_path + "core/" + fam + ext ,"w") 
+		for id in reintroduced[fam]:
+			h.write(">" + id + "\n" + seq[sp][id]  + "\n")
+			resu += "\t" + id
+		h.close()
+		g.write(resu + "\n")
+	g.close()
 
 print("\n######################################")
-print("Final core genome= ",len(filtered_core[sp])," genes")
+print("Final core genome= ",len(filtered_core[sp]) + len(reintroduced.keys())," genes")
 print("ouput written in ",out_path)
 print("The file 'families_core.txt' contains the list of orthologous genes")
 print("The directory 'core' contains the sequences each orthologous gene")

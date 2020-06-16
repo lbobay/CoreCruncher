@@ -508,7 +508,8 @@ for sp in species:
 				#g.write(">" + fam + "&" + ref_id + "\n" + seq[sp][ref_id] + "\n")
 			else:
 				#print("   Case: ", fam," ",paralogs," ",orthologs)
-				save.append(fam)
+				if fam not in save:
+					save.append(fam)
 				nb+=1
 		if tag==1:
 			#print("Check ",fam," ",len(families[sp][fam])," ",families[sp][fam]
@@ -556,7 +557,8 @@ for sp in species:
 						pass
 			if outlier=="y":
 				compteur+=1
-				save.append(fam)
+				if fam not in save:
+					save.append(fam)
 			else:
 				filtered_core[sp].append(fam)
 			
@@ -696,13 +698,16 @@ for sp in species:
 		h.close()
 		g.write(resu + "\n")
 	for fam in reintroduced:
-		resu = fam
-		h=open(out_path + "core/" + fam + ext ,"w") 
-		for id in reintroduced[fam]:
-			h.write(">" + id + "\n" + seq[sp][id]  + "\n")
-			resu += "\t" + id
-		h.close()
-		g.write(resu + "\n")
+		if fam in filtered_core[sp]:
+			print("PROBLEM: ",fam,"duplicated. This should not have happened...")
+		else:
+			resu = fam
+			h=open(out_path + "core/" + fam + ext ,"w") 
+			for id in reintroduced[fam]:
+				h.write(">" + id + "\n" + seq[sp][id]  + "\n")
+				resu += "\t" + id
+			h.close()
+			g.write(resu + "\n")
 	g.close()
 
 print("\n######################################")

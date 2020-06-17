@@ -679,7 +679,7 @@ for sp in species:
 				for id in toto:
 					seq[sp][id] = "".join(toto[id]).upper()
 
-
+SAVED=[]
 print("Writing")
 for sp in species:
 	g=open(out_path + "families_core.txt","w")
@@ -701,6 +701,7 @@ for sp in species:
 		if fam in filtered_core[sp]:
 			print("PROBLEM: ",fam,"duplicated. This should not have happened...")
 		else:
+			SAVED.append(fam)
 			resu = fam
 			h=open(out_path + "core/" + fam + ext ,"w") 
 			for id in reintroduced[fam]:
@@ -711,7 +712,7 @@ for sp in species:
 	g.close()
 
 print("\n######################################")
-print("Final core genome= ",len(filtered_core[sp]) + len(reintroduced.keys())," genes")
+print("Final core genome= ",len(filtered_core[sp]) + len(SAVED)," genes")
 print("ouput written in ",out_path)
 print("The file 'families_core.txt' contains the list of orthologous genes")
 print("The directory 'core' contains the sequences each orthologous gene")

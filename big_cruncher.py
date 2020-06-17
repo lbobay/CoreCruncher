@@ -455,8 +455,8 @@ for sp in species:
 	total=0
 	nb=0
 	ref = REF
-	tag=0
 	for fam in core[sp]:
+		tag=0
 		total+=1
 		for resu in families[sp][fam]:
 			if IDENTIFIANTS == "unique":

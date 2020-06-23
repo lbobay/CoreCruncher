@@ -12,8 +12,8 @@ startTime = datetime.now()
 
 loc=""
 for stuff in sys.argv:
-	if "master.py" in stuff:
-		loc = stuff.split("master.py")[0]
+	if "corecruncher_master.py" in stuff:
+		loc = stuff.split("corecruncher_master.py")[0]
 		print("Location=",loc)
 
 path =  "/Users/lbobay/Desktop/dossiers/pan/test/database/"
@@ -31,10 +31,10 @@ if "-h" in arguments:
 	print("-out     output folder")
 	print("\nOPTIONS: ")
 	print("-freq     	Minimum frequency of the gene across genomes to be considered core (default= 90%, an ortholog is considered a core gene even if it is missing in 10% of the set of genomes)")
-	print("-score    	Identity score used by usearch or blast to define orthologs in % (Default= 70)")
+	print("-score    	Identity score used by usearch or blast to define orthologs in % (Default= 90)")
 	print("-length   	Minimum sequence length conservation used by to define orthologs (default= 80%)")
 	print("-prog     	Program to use to compare sequences: usearch or blast (default= usearch)")
-	print("-ref      	Reference genome (default: first genome in folder will be used as reference). If you want to specify the reference genome to use, speficy the name of the file in the folder (e.g. -ref genome1.prot)")
+	print("-ref      	Reference genome (default: first genome in folder will be used as reference). If you want to specify the reference genome to use, specify the name of the file in the folder (e.g. -ref genome1.prot)")
 	print("-id       	Type of gene IDs in output files. Choose 'unique' if the same gene IDs are not found in different genomes or 'combined' to combine genome ID & gene ID (default= 'combined').  ")
 	print("-ext	     	File extensions .fa/.fasta/.prot/.faa (default: will try to find it automatically)")
 	print("-list     	Path to a file containing the list of genomes to analyze (default: none, all the genomes in the folder will be analyzed by default)")
@@ -96,7 +96,7 @@ if "-score" in arguments:
 	i = arguments.index("-score")
 	score= arguments[i+1]
 else:
-	score="70"
+	score="90"
 
 if "-length" in arguments:
 	i = arguments.index("-length")
@@ -129,7 +129,7 @@ else:
 	stringent= "no"
 
 print("input = ", path)
-print("output = ", path)
+print("output = ", out_path)
 
 
 print("PARAMETERS: " + path + " " + out_path + " " + REF  + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + stringent)
@@ -140,12 +140,12 @@ except OSError:
 	pass
 
 try:
-	os.mkdir(out_path + "BBH")
+	os.mkdir(out_path + "CC")
 except OSError:
 	pass
 
 if restart == "yes":
-	os.system("rm " + out_path + "BBH/*" )	
+	os.system("rm " + out_path + "CC/*" )	
 
 
 try:
@@ -154,8 +154,9 @@ except OSError:
 	os.system("rm -r " + out_path + "core" )	
 	os.mkdir(out_path + "core")
 
-tmp = os.listdir(path)
+TMP = os.listdir(path)
 
+#print("tmp 1",TMP)
 
 extensions=[".fa",".fasta",".prot",".faa",".fna",".fnn",""]
 if ext in extensions:
@@ -163,11 +164,13 @@ if ext in extensions:
 
 
 ext_found=[]
-for stuff in tmp:
+for stuff in TMP:
 	if stuff[0] != ".":
 		alternative = "." + stuff.split(".")[-1]
 		if alternative not in ext_found:
 			ext_found.append(alternative)
+
+print(ext_found)
 
 if ext == "NA":
 	if len(ext_found)==1:
@@ -185,10 +188,13 @@ if ext == "NA":
 		else:
 			print("Please specify the extension of the files that you want to analyze, the following have been found:",ext_found)
 
+
+#print("tmp",TMP)
+
 memo=[]
 tag=0
 files = []
-for stuff in tmp:
+for stuff in TMP:
 	if stuff.endswith(ext):
 		files.append(stuff)
 		tag=1
@@ -197,6 +203,9 @@ for stuff in tmp:
 			if stuff.endswith(point):
 				if point not in memo:
 					memo.append(point)
+
+#print("ext",extensions)
+#print("memo",memo)
 
 if len(memo) > 0:
 	print("\n######################################")
@@ -212,6 +221,10 @@ if tag==0:
 	print("Exiting...")
 	print("######################################\n")
 	exit()
+
+
+print("The following genomes will be used:",files)
+print("A total of",len(files)," genomes\n")
 
 toto,seq,size={},{},{}
 check=[]
@@ -260,7 +273,7 @@ print("Building core genome with ",len(files)," genomes")
 if REF =="NA":
 	REF= files[0]
 
-print("Reference genome= ", REF)
+print("Pivot genome= ", REF)
 
 print(datetime.now() - startTime)
 
@@ -285,7 +298,24 @@ if "-align" in arguments:
 	os.system("python " + loc + "concat.py " + out_path + " " + ext )
 
 
+nb=0
+f=open(out_path + "families_core.txt","r")
+for l in f:
+	nb+=1
 
+h=open(out_path + "summary.txt","w")
+h.write("Core genome: " + str(nb) + " genes\n")
+h.write("Parameters:\n")
+h.write("Number of genomes used: " + str(len(files)) + "\n")
+h.write("Pivot genome used: " + REF + "\n")
+h.write("Input folder: " + path + "\n")
+h.write("Program used to search sequences: " + PROG + "\n")
+h.write("Sequence identity used to infer orthologs: " + str(score) + "%\n")
+h.write("Sequence length conservation used to infer orthologs: " + str(length) + "%\n")
+h.write("Frequency used to infer core genes: " + str(freq) + "%\n")
+h.write("stringent inferrence :" + stringent + "\n") 
+
+h.close()
 
 print(datetime.now() - startTime)
 
@@ -295,9 +325,7 @@ print(datetime.now() - startTime)
 
 
 
-
-
-
+ 
 
 
 

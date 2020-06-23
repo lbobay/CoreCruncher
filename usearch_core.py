@@ -132,13 +132,13 @@ for sp in species:
 bbh={}
 for sp in species:
 	bbh[sp]={}
-	BBH = os.listdir(out_path + 'BBH/')
-	for file in BBH:
+	CC = os.listdir(out_path + 'CC/')
+	for file in CC:
 		#bbh[sp][file]='y'
 		if 1==1:
 			nb=0
 			tag=0
-			f=open(out_path + 'BBH/' + file , "r")
+			f=open(out_path + 'CC/' + file , "r")
 			for l in f:
 				nb+=1
 				a=l.strip("\n").split("\t")
@@ -173,12 +173,12 @@ for sp in species:
 								pass
 							elif resu1 in bbh[sp]:
 								print(sp,'/',nb)
-								os.system('usearch61  -usearch_global  '   + path + prot2 + ' -db  ' + path  + prot1  + option +  ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'BBH/' + prot2 + '-' + prot1 )
+								os.system('usearch61  -usearch_global  '   + path + prot2 + ' -db  ' + path  + prot1  + option +  ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'CC/' + prot2 + '-' + prot1 )
 							elif resu2 in bbh[sp]:
-								os.system('usearch61  -usearch_global  '  + path + prot1 + ' -db  ' + path  + prot2  + option + ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'BBH/' + prot1 + '-' + prot2 )
+								os.system('usearch61  -usearch_global  '  + path + prot1 + ' -db  ' + path  + prot2  + option + ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'CC/' + prot1 + '-' + prot2 )
 							else:
-								os.system('usearch61  -usearch_global  '  + path  + prot1 + ' -db  ' + path   + prot2  + option + ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'BBH/' + prot1 + '-' + prot2 )
-								os.system('usearch61  -usearch_global  '  + path + prot2 + ' -db  ' + path  + prot1 +  option + ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'BBH/' + prot2 + '-' + prot1 )
+								os.system('usearch61  -usearch_global  '  + path  + prot1 + ' -db  ' + path   + prot2  + option + ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'CC/' + prot1 + '-' + prot2 )
+								os.system('usearch61  -usearch_global  '  + path + prot2 + ' -db  ' + path  + prot1 +  option + ' -id ' + str(score) + ' -maxaccepts 3  -blast6out ' + out_path + 'CC/' + prot2 + '-' + prot1 )
 
 		else:
 			print(sp, ' empty')

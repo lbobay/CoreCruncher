@@ -170,7 +170,7 @@ for sp in species:
 			if st1 == ref or st2==ref:
 				if st1!=st2:
 					nb=0
-					f=open(out_path +  "BBH/" + st1 + "-" + st2 ,"r")
+					f=open(out_path +  "CC/" + st1 + "-" + st2 ,"r")
 					for l in f:
 						a=l.strip("\n").split("\t")
 						if len(a) == 10:
@@ -222,10 +222,10 @@ for sp in species:
 							if s1/s2 >= south and s1/s2 <=north and float(a[i]) >= SCORE:
 								dico[sp][st1][st2][id1][id2] = float(a[i])
 						else:
-							"Usearch issue: File BBH/" + st1 + "-" + st2," did not finish running"
+							"Usearch issue: File CC/" + st1 + "-" + st2," did not finish running"
 					f.close()
 					if nb == 0:
-						"Usearch issue: File BBH/" + st1 + "-" + st2," is empty. You should remove empty genomes or relaunch the analysis"
+						"Usearch issue: File CC/" + st1 + "-" + st2," is empty. You should remove empty genomes or relaunch the analysis"
 
 size={}
 
@@ -434,7 +434,7 @@ for sp in species:
 					QUARTILES[sp][st1][st2] = [quartile1(horizontal[sp][st1][st2]),quartile3(horizontal[sp][st1][st2])]
 					#print("horizontal: ",st1," ",st2," ",sum(horizontal[sp][st1][st2])/len(horizontal[sp][st1][st2])," ",horizontal[sp][st1][st2][:10]
 				else:
-					print("BBH file ",st1," ",st2," seems empty")
+					print("CC file ",st1," ",st2," seems empty")
 					MEDIAN[sp][st1][st2],SD[sp][st1][st2]=0,0
 					QUARTILES[sp][st1][st2]=[0,0]
 

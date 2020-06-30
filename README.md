@@ -14,4 +14,4 @@ Or change the lines 176 to 181 in the script usearch_core.py
 Requires the python library numpy
 
 Simple example:
-python master.py -in example -out out_folder
+python corecruncher_master.py -in example -out out_folder

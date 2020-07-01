@@ -1,3 +1,7 @@
+
+
+![Image of CoreCruncher](https://github.com/lbobay/CoreCruncher/blob/master/Logo.png)
+
 # CoreCruncher
 Requires Usearch (32 bits) or BLAST (tested successfully with BLAST 2.7.1+)
 Please download USEARCH: https://www.drive5.com/usearch/ or BLAST
@@ -15,3 +19,6 @@ Requires the python library numpy
 
 Simple example:
 python corecruncher_master.py -in example -out out_folder
+
+
+

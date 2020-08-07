@@ -78,13 +78,14 @@ if stringent=="yes":
 species=[SP]
 
 
+NAME = FILE.split(".txt")[0]
 
 print(sys.argv)
 
 
 sub=[]
 if FILE != "none":
-	f=open(FILE ,"r")
+	f=open(out_path + FILE ,"r")
 	for l in f:
 		st = l.strip("\n").strip("\r") 
 		if st.endswith(ext):
@@ -683,20 +684,20 @@ for sp in species:
 SAVED=[]
 print("Writing")
 for sp in species:
-	g=open(out_path + "families_core.txt","w")
+	g=open(out_path + "families_" + NAME + ".txt","w")
 	for fam in filtered_core[sp]:
 		resu = fam
-		h=open(out_path + "core/" + fam + ext ,"w") 
+		#h=open(out_path + "core/" + fam + ext ,"w") 
 		for id in families[sp][fam]:
 			#if IDENTIFIANTS == "unique":
 			#	h.write(">" + parent[id] + "&" + id + "\n" + seq[sp][id]  + "\n")
 			#else:
-			h.write(">" + id + "\n" + seq[sp][id]  + "\n")
+			#h.write(">" + id + "\n" + seq[sp][id]  + "\n")
 			#if IDENTIFIANTS == "unique":
 			#	resu += "\t" + parent[id] + "&" + id
 			#else:
 			resu += "\t" + id
-		h.close()
+		#h.close()
 		g.write(resu + "\n")
 	for fam in reintroduced:
 		if fam in filtered_core[sp]:
@@ -704,16 +705,16 @@ for sp in species:
 		else:
 			SAVED.append(fam)
 			resu = fam
-			h=open(out_path + "core/" + fam + ext ,"w") 
+			#h=open(out_path + "core/" + fam + ext ,"w") 
 			for id in reintroduced[fam]:
-				h.write(">" + id + "\n" + seq[sp][id]  + "\n")
+				#h.write(">" + id + "\n" + seq[sp][id]  + "\n")
 				resu += "\t" + id
-			h.close()
+			#h.close()
 			g.write(resu + "\n")
 	g.close()
 
 print("\n######################################")
-print("Final core genome= ",len(filtered_core[sp]) + len(SAVED)," genes")
+print("Partial core genome= ",len(filtered_core[sp]) + len(SAVED)," genes")
 print("ouput written in ",out_path)
 print("The file 'families_core.txt' contains the list of orthologous genes")
 print("The directory 'core' contains the sequences each orthologous gene")

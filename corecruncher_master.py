@@ -1,6 +1,6 @@
 
 
-print("USAGE: python master.py  -in input_folder   -out  output_folder   OPTIONAL: -freq  frequency_across_genomes  -ref ref_genome -prog usearch/blast -id unique/combined   -ext .fa/.fasta/.prot/.faa   -list path_to_genome_list   -score identify_score   -length sequence_length_conservation  -restart yes/no    -align muscle/mafft  -stringent yes/no") 
+print("USAGE: python corecruncher_master.py  -in input_folder   -out  output_folder   OPTIONAL: -freq  frequency_across_genomes  -ref ref_genome -prog usearch/blast -id unique/combined   -ext .fa/.fasta/.prot/.faa   -list path_to_genome_list   -score identify_score   -length sequence_length_conservation  -restart yes/no    -align muscle/mafft  -stringent yes/no  -batches 1") 
 print("Use -h to see the different options\n")
 
 import os
@@ -41,6 +41,7 @@ if "-h" in arguments:
 	print("-restart  	Restart analysis from scratch: yes or no (default= no). If yes is chosen, the program will erase the usearch output files and relaunch usearch or blast")
 	print("-align    	Align core gene sequences with specified program (muscle or mafft) and merge all the core genes into a single concatenate. Example=  -align musclev0.0.0 or -align mafft)")
 	print("-stringent   Define a stringent core genome: yes or no (default= no). By default, core genes with paralogs will be conserved in the core genome and the paralogous sequences will be removed. If stringent is chosen, the core gene will be entirely removed from the core genome)")
+	print("-batches     Number of batches of genomes. You can divide the analysis in multiple batches of genomes when analyzing large datasets and if your computer can't process all the genomes at once (default= 1, all genomes are anlyzed together)")
 
 	exit()
 
@@ -127,6 +128,13 @@ if "-stringent" in arguments:
 	stringent = arguments[i+1]
 else:
 	stringent= "no"
+	
+	
+if "-batches" in arguments:
+	i = arguments.index("-batches")
+	batches = int(arguments[i+1])
+else:
+	batches = 1
 
 print("input = ", path)
 print("output = ", out_path)
@@ -289,7 +297,14 @@ print("TAG2")
 print("Sequence search complete")
 print(datetime.now() - startTime)
 
-os.system("python " + loc + "big_cruncher.py  " + stringent + " "  + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
+if batches==1:
+	os.system("python " + loc + "big_cruncher.py  " + stringent + " "  + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
+else:
+	os.system("python " + loc + "divide.py  "  + loc + " "   + str(batches) + " "  + stringent + " "  + path + " " + out_path + " " + REF + " " + TYPE + " " + ext + " " + FILE + " " + freq + " " + score + " " + length + " " + IDENTIFIANTS)
+
+
+if batches!=1:
+	os.system("python " + loc + "reunite.py  " + REF + " " + path + " " + out_path  )
 
 
 if "-align" in arguments:

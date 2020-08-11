@@ -444,6 +444,8 @@ horizontal={}
 # Two steps:
 # Step 1 identify families with potential paralogs
 # Step 2 check if score is in the range of orthologs (in case of divergent genome)
+
+double_outliers=[]
 save=[]
 excommunicated={}
 filtered_core={}
@@ -558,6 +560,8 @@ for sp in species:
 						pass
 			if outlier=="y":
 				compteur+=1
+				if fam not in double_outliers:
+					double_outliers.append(fam)
 				if fam not in save:
 					save.append(fam)
 			else:
@@ -641,6 +645,19 @@ if SAVE=="yes":
 	print("Case1:",case1)
 	print("Case2:",case2)
 
+
+
+h=open(out_path + "double_ouliers.txt","w")
+for fam in double_outliers:
+	if fam not in reintroduced:
+		for sp in core:
+			#print(fam," is a double outlier ",core[sp][fam])
+			h.write(fam + "\t" + "\t".join(core[sp][fam]) + "\n" )
+
+h.close()
+			
+
+	
 
 dico={}
 

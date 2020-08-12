@@ -649,10 +649,9 @@ if SAVE=="yes":
 
 h=open(out_path + "double_ouliers.txt","w")
 for fam in double_outliers:
-	if fam not in reintroduced:
-		for sp in core:
-			#print(fam," is a double outlier ",core[sp][fam])
-			h.write(fam + "\t" + "\t".join(core[sp][fam]) + "\n" )
+	for sp in core:
+		#print(fam," is a double outlier ",core[sp][fam])
+		h.write(fam + "\t" + "\t".join(core[sp][fam]) + "\n" )
 
 h.close()
 			

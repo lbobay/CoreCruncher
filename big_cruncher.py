@@ -571,6 +571,18 @@ for sp in species:
 	#h.close()
 	#g.close()
 
+
+print("double_outliers:",double_outliers)
+
+h=open(out_path + "double_outliers.txt","w")
+for sp in species:
+	for fam in double_outliers:
+		h.write(fam + "\t" + "\t".join(families[sp][fam]) + "\n" )
+
+h.close()
+			
+
+
 vertical={}
 core={}
 bbh={}
@@ -579,6 +591,7 @@ print("Excluded: ", nb," genes")
 print("There are ",compteur," families with double outliers\n")
 
 print("There are ",len(save)," genes that may be saved")
+
 
 
 
@@ -646,15 +659,6 @@ if SAVE=="yes":
 	print("Case2:",case2)
 
 
-
-h=open(out_path + "double_ouliers.txt","w")
-for fam in double_outliers:
-	for sp in core:
-		#print(fam," is a double outlier ",core[sp][fam])
-		h.write(fam + "\t" + "\t".join(core[sp][fam]) + "\n" )
-
-h.close()
-			
 
 	
 

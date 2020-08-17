@@ -263,10 +263,12 @@ for fam in new:
 
 
 sp="test"
+genomes={}
 seq={}
 if 1==1:
 	nb=0
 	seq[sp]={}
+	genomes[sp]={}
 	tmp = os.listdir(path)
 	for file in tmp:
 		if 1==1: #if file.endswith(ext) :
@@ -291,7 +293,7 @@ if 1==1:
 tmp = list(seq[sp].keys())
 id = tmp[0]
 
-SEQ = seq[id]
+SEQ = seq[sp][id]
 A = SEQ.count("A")
 C = SEQ.count("C")
 G = SEQ.count("G")
@@ -311,7 +313,7 @@ print("Writing output file consensus_core.txt in ",outpath)
 h=open(outpath + "consensus_core.txt","w")
 
 try:
-	os.mkdir(oupath + "core")
+	os.mkdir(outpath + "core")
 except OSError:
 	pass
 
@@ -320,7 +322,7 @@ for fam in final:
 	nb+=1
 	name = "fam" + str(nb)
 	h.write(name + "\t" + "\t".join(final[fam]) + "\n")
-	g=open(oupath + "core/" + fam + ext)
+	g=open(outpath + "core/" + fam + ext)
 	for id in final[fam]:
 		g.write(">" + id + "\n" + seq[sp][id] + "\n")
 	g.close()

@@ -268,7 +268,7 @@ seq={}
 if 1==1:
 	nb=0
 	seq[sp]={}
-	genomes[sp]={}
+	genomes[sp]=[]
 	tmp = os.listdir(path)
 	for file in tmp:
 		if 1==1: #if file.endswith(ext) :
@@ -322,7 +322,7 @@ for fam in final:
 	nb+=1
 	name = "fam" + str(nb)
 	h.write(name + "\t" + "\t".join(final[fam]) + "\n")
-	g=open(outpath + "core/" + fam + ext)
+	g=open(outpath + "core/" + name + ext)
 	for id in final[fam]:
 		g.write(">" + id + "\n" + seq[sp][id] + "\n")
 	g.close()

@@ -122,8 +122,8 @@ for fam in build:
 		h.close()
 
 
-print("Fincal Core Genome= ",nb,"genes")
-print("This core genome was computed into ",len(partitions)," subsets to deal with memry issues")
+print("Final Core Genome= ",nb,"genes")
+print("This core genome was computed into ",len(partitions)," subsets to deal with memory issues")
 
 
 

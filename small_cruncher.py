@@ -716,8 +716,8 @@ for sp in species:
 print("\n######################################")
 print("Partial core genome= ",len(filtered_core[sp]) + len(SAVED)," genes")
 print("ouput written in ",out_path)
-print("The file 'families_core.txt' contains the list of orthologous genes")
-print("The directory 'core' contains the sequences each orthologous gene")
+print("The file 'families_core.txt' contains the list of core genes")
+print("The directory 'core' contains the sequences of each core gene")
 print("Reference genome used for the analysis= ",REF)
 print("######################################")
 

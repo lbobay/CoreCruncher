@@ -16,6 +16,7 @@ stuff = ALIGN.lower()
 if "muscle" in stuff:
 	version = subprocess.check_output("muscle -version", shell=True)
 	version = version.lower()
+	version = version.strip("v")
 	sub = int(version.split(".")[0][-1])
 	print("Calling muscle with '",ALIGN,"' with default parameters")
 	for seq in FILES:

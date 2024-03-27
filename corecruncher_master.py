@@ -162,7 +162,7 @@ except OSError:
 	os.system("rm -r " + out_path + "core" )	
 	os.mkdir(out_path + "core")
 
-TMP = os.listdir(path)
+TMP = sorted(os.listdir(path))
 
 #print("tmp 1",TMP)
 

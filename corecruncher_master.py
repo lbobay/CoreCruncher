@@ -266,13 +266,13 @@ for stuff in files:
 
 #print("Check= ",check
 
-if min(check) < 0.5 and max(check) < 0.5 :
+if min(check) < 0.8 and max(check) < 0.8 :
 	print("TYPE= Protein sequences")
 	TYPE="protein"
-elif min(check) > 0.5 and max(check) > 0.5 :
+elif min(check) > 0.8 and max(check) > 0.8 :
 	print("TYPE= DNA sequences")
 	TYPE="DNA"
-elif min(check) < 0.5 and max(check) > 0.5 :
+elif min(check) < 0.8 and max(check) > 0.8 :
 	print("PROBLEM: BOTH DNA and protein sequences were given. Exiting...")
 	exit()
 
